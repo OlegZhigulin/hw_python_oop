@@ -12,7 +12,7 @@ class InfoMessage:
     calories: float
 
     def get_message(self) -> str:
-        return self.__str__()
+        return str(self)
 
     def __str__(self) -> str:
         return (f'Тип тренировки: {self.training_type}; '
@@ -61,20 +61,22 @@ class Training:
 class Running(Training):
     """Тренировка: бег."""
 
-    FIRST_COEFF_CALORIE: int = 18
-    SECOND_COEFF_CALORIE: int = 20
+    RUN_COEFF_CALORIE_MEAN_SPEED_MULTIPLC: int = 18
+    RUN_COEFF_CALORIE_MEAN_SPEED_SHIFT: int = 20
 
     def get_spent_calories(self) -> float:
 
-        return ((self.FIRST_COEFF_CALORIE * self.get_mean_speed()
-                - self.SECOND_COEFF_CALORIE) * self.weight / self.M_IN_KM
+        return ((self.RUN_COEFF_CALORIE_MEAN_SPEED_MULTIPLC
+                * self.get_mean_speed()
+                - self.RUN_COEFF_CALORIE_MEAN_SPEED_SHIFT)
+                * self.weight / self.M_IN_KM
                 * self.duration * self.H_IN_MIN)
 
 
 class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
-    FIRST_COEFF_CALORIE: float = 0.035
-    SECOND_COEFF_CALORIE: float = 0.029
+    SPORT_WALK_COEFF_CALORIE: float = 0.035
+    SPORT_WALK_COEFF_CALORIE_WEIGHT_MULTIPLC: float = 0.029
 
     def __init__(self,
                  action,
@@ -86,17 +88,17 @@ class SportsWalking(Training):
         self.height = height
 
     def get_spent_calories(self) -> float:
-        return ((self.FIRST_COEFF_CALORIE * self.weight + (
+        return ((self. SPORT_WALK_COEFF_CALORIE * self.weight + (
             self.get_mean_speed()**2 // self.height)
-            * self.SECOND_COEFF_CALORIE * self.weight)
+            * self.SPORT_WALK_COEFF_CALORIE_WEIGHT_MULTIPLC * self.weight)
             * self.duration * self.H_IN_MIN)
 
 
 class Swimming(Training):
     """Тренировка: плавание."""
     LEN_STEP: float = 1.38
-    FIRST_COEFF_CALORIE: float = 1.1
-    SECOND_COEFF_CALORIE: int = 2
+    SWIM_COEFF_CALORIE_MEAN_SPEED_ADDITION: float = 1.1
+    SWIM_COEFF_CALORIE_MULTIPLC: int = 2
 
     def __init__(self,
                  action,
@@ -120,7 +122,8 @@ class Swimming(Training):
 
     def get_spent_calories(self) -> float:
         return ((self.get_mean_speed()
-                + self.FIRST_COEFF_CALORIE) * self.SECOND_COEFF_CALORIE
+                + self.SWIM_COEFF_CALORIE_MEAN_SPEED_ADDITION)
+                * self.SWIM_COEFF_CALORIE_MULTIPLC
                 * self.weight)
 
 
@@ -133,9 +136,9 @@ def read_package(workout_type: str, data: list) -> Training:
     }
     if workout_type in workout_type_classes:
         return workout_type_classes[workout_type](*data)
-    else:
-        raise ValueError('Данный вид тренировки отстутсвует, '
-                         'проверьте правильность написания')
+
+    raise ValueError('Данный вид тренировки отстутсвует, '
+                     'проверьте правильность написания')
 
 
 def main(training: Training) -> None:
